@@ -2,8 +2,9 @@
 
 import Link from "next/link"
 import Image from "next/image"
-import { useState } from "react"
-import { Menu, X, ChevronDown, Globe, Phone } from "lucide-react"
+import { useState, useEffect } from "react"
+import { usePathname } from "next/navigation"
+import { Menu, X, ChevronDown, Phone, Mail, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -14,10 +15,7 @@ import {
 
 const navLinks = [
   { label: "Home", href: "/" },
-  {
-    label: "About Us",
-    href: "/about",
-  },
+  { label: "About", href: "/about" },
   {
     label: "Services",
     href: "/services",
@@ -30,85 +28,109 @@ const navLinks = [
       { label: "Custom Travel Planning", href: "/services#custom" },
     ],
   },
-  { label: "Travel Packages", href: "/packages" },
+  { label: "Packages", href: "/packages" },
   { label: "Trip Planner", href: "/trip-planner" },
-  { label: "Cost Calculator", href: "/calculator" },
   { label: "Promotions", href: "/promotions" },
   { label: "Contact", href: "/contact" },
 ]
 
-const languages = [
-  { code: "en", label: "English" },
-  { code: "sn", label: "Shona" },
-  { code: "nd", label: "Ndebele" },
-  { code: "fr", label: "French" },
-]
-
 export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false)
-  const [lang, setLang] = useState("en")
+  const [scrolled, setScrolled] = useState(false)
+  const pathname = usePathname()
+
+  useEffect(() => {
+    function onScroll() {
+      setScrolled(window.scrollY > 20)
+    }
+    window.addEventListener("scroll", onScroll, { passive: true })
+    return () => window.removeEventListener("scroll", onScroll)
+  }, [])
+
+  useEffect(() => {
+    setMobileOpen(false)
+  }, [pathname])
+
+  const isActive = (href: string) => {
+    if (href === "/") return pathname === "/"
+    return pathname.startsWith(href)
+  }
 
   return (
     <>
       {/* Top Bar */}
       <div className="bg-primary text-primary-foreground">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-2 text-sm">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-2 text-xs sm:text-sm">
           <div className="flex items-center gap-4">
-            <a href="tel:+263772302946" className="flex items-center gap-1 hover:underline">
+            <a href="tel:+263772302946" className="flex items-center gap-1.5 transition-opacity hover:opacity-80">
               <Phone className="h-3.5 w-3.5" />
               <span className="hidden sm:inline">+263 772 302 946</span>
             </a>
-            <span className="hidden text-primary-foreground/70 md:inline">|</span>
-            <span className="hidden md:inline">info@impalatravel.co.zw</span>
+            <span className="hidden text-primary-foreground/40 md:inline">|</span>
+            <a href="mailto:info@impalatravel.co.zw" className="hidden items-center gap-1.5 transition-opacity hover:opacity-80 md:flex">
+              <Mail className="h-3.5 w-3.5" />
+              info@impalatravel.co.zw
+            </a>
           </div>
           <div className="flex items-center gap-3">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button className="flex items-center gap-1 rounded px-2 py-1 text-sm transition-colors hover:bg-accent/20">
-                  <Globe className="h-3.5 w-3.5" />
-                  <span>{languages.find((l) => l.code === lang)?.label}</span>
-                  <ChevronDown className="h-3 w-3" />
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                {languages.map((l) => (
-                  <DropdownMenuItem key={l.code} onClick={() => setLang(l.code)}>
-                    {l.label}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-            <Link href="/login">
-              <Button variant="outline" size="sm" className="border-primary-foreground/30 bg-transparent text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground">
-                Login
-              </Button>
+            <Link href="/documents" className="text-primary-foreground/80 transition-opacity hover:opacity-100">
+              Upload Docs
+            </Link>
+            <span className="text-primary-foreground/40">|</span>
+            <Link href="/login" className="text-primary-foreground/80 transition-opacity hover:opacity-100">
+              Sign In
+            </Link>
+            <Link href="/dashboard" className="hidden text-primary-foreground/80 transition-opacity hover:opacity-100 sm:inline">
+              My Account
             </Link>
           </div>
         </div>
       </div>
 
       {/* Main Nav */}
-      <header className="sticky top-0 z-50 border-b border-border bg-card shadow-sm">
+      <header
+        className={`sticky top-0 z-50 transition-all duration-300 ${
+          scrolled
+            ? "border-b border-border/50 bg-card/80 shadow-lg glass"
+            : "border-b border-border bg-card"
+        }`}
+      >
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
-          <Link href="/" className="flex items-center gap-2">
-            <Image src="/images/logo.png" alt="Impala Travel Agency" width={160} height={50} className="h-12 w-auto" priority />
+          <Link href="/" className="flex items-center gap-2 transition-transform hover:scale-[1.02]">
+            <Image
+              src="/images/logo.png"
+              alt="Impala Travel Agency"
+              width={160}
+              height={50}
+              className="h-11 w-auto"
+              priority
+            />
           </Link>
 
           {/* Desktop Nav */}
-          <nav className="hidden items-center gap-1 lg:flex">
+          <nav className="hidden items-center gap-0.5 lg:flex">
             {navLinks.map((link) =>
               link.children ? (
                 <DropdownMenu key={link.label}>
                   <DropdownMenuTrigger asChild>
-                    <button className="flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-secondary hover:text-primary">
+                    <button
+                      className={`group flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200 ${
+                        isActive(link.href)
+                          ? "bg-primary/10 text-primary"
+                          : "text-foreground hover:bg-secondary hover:text-primary"
+                      }`}
+                    >
                       {link.label}
-                      <ChevronDown className="h-3.5 w-3.5" />
+                      <ChevronDown className="h-3.5 w-3.5 transition-transform duration-200 group-data-[state=open]:rotate-180" />
                     </button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent>
+                  <DropdownMenuContent align="start" className="w-56 animate-scale-in">
                     {link.children.map((child) => (
                       <DropdownMenuItem key={child.label} asChild>
-                        <Link href={child.href}>{child.label}</Link>
+                        <Link href={child.href} className="flex items-center justify-between">
+                          {child.label}
+                          <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
+                        </Link>
                       </DropdownMenuItem>
                     ))}
                   </DropdownMenuContent>
@@ -117,9 +139,16 @@ export function Navbar() {
                 <Link
                   key={link.label}
                   href={link.href}
-                  className="rounded-lg px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-secondary hover:text-primary"
+                  className={`relative rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200 ${
+                    isActive(link.href)
+                      ? "bg-primary/10 text-primary"
+                      : "text-foreground hover:bg-secondary hover:text-primary"
+                  }`}
                 >
                   {link.label}
+                  {isActive(link.href) && (
+                    <span className="absolute bottom-0 left-1/2 h-0.5 w-4 -translate-x-1/2 rounded-full bg-primary" />
+                  )}
                 </Link>
               )
             )}
@@ -127,7 +156,7 @@ export function Navbar() {
 
           <div className="hidden items-center gap-3 lg:flex">
             <Link href="/booking">
-              <Button className="rounded-full bg-primary px-6 text-primary-foreground shadow-md hover:bg-accent">
+              <Button className="rounded-full bg-primary px-6 text-primary-foreground shadow-md transition-all duration-200 hover:bg-accent hover:shadow-lg hover:-translate-y-0.5">
                 Book Now
               </Button>
             </Link>
@@ -135,56 +164,68 @@ export function Navbar() {
 
           {/* Mobile Toggle */}
           <button
-            className="rounded-lg p-2 text-foreground lg:hidden"
+            className="rounded-lg p-2 text-foreground transition-colors hover:bg-secondary lg:hidden"
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label="Toggle menu"
           >
-            {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            <div className="relative h-6 w-6">
+              <Menu className={`absolute inset-0 h-6 w-6 transition-all duration-300 ${mobileOpen ? "rotate-90 opacity-0" : "rotate-0 opacity-100"}`} />
+              <X className={`absolute inset-0 h-6 w-6 transition-all duration-300 ${mobileOpen ? "rotate-0 opacity-100" : "-rotate-90 opacity-0"}`} />
+            </div>
           </button>
         </div>
 
         {/* Mobile Nav */}
-        {mobileOpen && (
-          <div className="border-t border-border bg-card lg:hidden">
-            <nav className="flex flex-col px-4 py-4">
-              {navLinks.map((link) =>
-                link.children ? (
-                  <div key={link.label} className="flex flex-col">
-                    <span className="px-3 py-2.5 text-sm font-semibold text-muted-foreground">
-                      {link.label}
-                    </span>
-                    {link.children.map((child) => (
-                      <Link
-                        key={child.label}
-                        href={child.href}
-                        className="rounded-lg px-6 py-2 text-sm text-foreground transition-colors hover:bg-secondary"
-                        onClick={() => setMobileOpen(false)}
-                      >
-                        {child.label}
-                      </Link>
-                    ))}
-                  </div>
-                ) : (
-                  <Link
-                    key={link.label}
-                    href={link.href}
-                    className="rounded-lg px-3 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-secondary"
-                    onClick={() => setMobileOpen(false)}
-                  >
+        <div
+          className={`overflow-hidden border-t border-border bg-card transition-all duration-300 lg:hidden ${
+            mobileOpen ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"
+          }`}
+        >
+          <nav className="flex flex-col px-4 py-4">
+            {navLinks.map((link) =>
+              link.children ? (
+                <div key={link.label} className="flex flex-col">
+                  <span className="px-3 py-2.5 text-xs font-bold uppercase tracking-wider text-muted-foreground">
                     {link.label}
-                  </Link>
-                )
-              )}
-              <div className="mt-4 flex flex-col gap-2 px-3">
-                <Link href="/booking" onClick={() => setMobileOpen(false)}>
-                  <Button className="w-full rounded-full bg-primary text-primary-foreground hover:bg-accent">
-                    Book Now
-                  </Button>
+                  </span>
+                  {link.children.map((child) => (
+                    <Link
+                      key={child.label}
+                      href={child.href}
+                      className="rounded-lg px-6 py-2 text-sm text-foreground transition-colors hover:bg-secondary hover:text-primary"
+                    >
+                      {child.label}
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+                <Link
+                  key={link.label}
+                  href={link.href}
+                  className={`rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+                    isActive(link.href)
+                      ? "bg-primary/10 text-primary"
+                      : "text-foreground hover:bg-secondary hover:text-primary"
+                  }`}
+                >
+                  {link.label}
                 </Link>
-              </div>
-            </nav>
-          </div>
-        )}
+              )
+            )}
+            <div className="mt-4 flex flex-col gap-2 px-3">
+              <Link href="/booking">
+                <Button className="w-full rounded-full bg-primary text-primary-foreground hover:bg-accent">
+                  Book Now
+                </Button>
+              </Link>
+              <Link href="/login">
+                <Button variant="outline" className="w-full rounded-full">
+                  Sign In
+                </Button>
+              </Link>
+            </div>
+          </nav>
+        </div>
       </header>
     </>
   )
