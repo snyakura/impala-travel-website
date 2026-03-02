@@ -39,8 +39,14 @@ const services = [
     icon: Car,
     title: "Car Rentals",
     description: "Explore destinations at your own pace with our reliable vehicle hire service. Choose from sedans, SUVs, 4x4s, and luxury vehicles with optional chauffeur service for the ultimate convenience.",
-    features: ["Self-drive or chauffeur", "Wide vehicle selection", "Insurance included", "Airport pickup & drop-off"],
+    features: ["Self Drive Rentals", "Chauffeur Driven Rentals", "Airport Transfers", "Shuttle Services"],
     image: "/images/mountain-hiking.jpg",
+    subLinks: [
+      { label: "Self Drive Rentals", href: "/car-rental/self-drive" },
+      { label: "Chauffeur Driven", href: "/car-rental/chauffeur" },
+      { label: "Airport Transfers", href: "/car-rental/airport-transfers" },
+      { label: "Shuttle Services", href: "/car-rental/shuttle" },
+    ],
   },
   {
     id: "visa",
@@ -108,6 +114,19 @@ export default function ServicesPage() {
                         <ArrowRight className="ml-2 h-4 w-4" />
                       </Button>
                     </Link>
+                    {"subLinks" in s && s.subLinks && (
+                      <div className="mt-4 flex flex-wrap gap-2">
+                        {(s.subLinks as { label: string; href: string }[]).map((link) => (
+                          <Link
+                            key={link.label}
+                            href={link.href}
+                            className="rounded-full border border-primary/20 px-4 py-1.5 text-sm font-medium text-primary transition-colors hover:bg-primary/10"
+                          >
+                            {link.label}
+                          </Link>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

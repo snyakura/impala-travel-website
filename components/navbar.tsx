@@ -23,13 +23,35 @@ const navLinks = [
       { label: "Flight Booking", href: "/services#flights" },
       { label: "Hotel Reservations", href: "/services#hotels" },
       { label: "Safari Tours", href: "/services#safaris" },
-      { label: "Car Rentals", href: "/services#car-rentals" },
       { label: "Visa Assistance", href: "/services#visa" },
       { label: "Custom Travel Planning", href: "/services#custom" },
     ],
   },
+  {
+    label: "Car Rental",
+    href: "/services#car-rentals",
+    children: [
+      { label: "Self Drive Rentals", href: "/car-rental/self-drive" },
+      { label: "Chauffeur Driven Rentals", href: "/car-rental/chauffeur" },
+      { label: "Airport Transfers", href: "/car-rental/airport-transfers" },
+      { label: "Shuttle Services", href: "/car-rental/shuttle" },
+    ],
+  },
+  {
+    label: "Destinations",
+    href: "/destinations",
+    children: [
+      { label: "Victoria Falls", href: "/destinations/victoria-falls" },
+      { label: "Kariba", href: "/destinations/kariba" },
+      { label: "Hwange National Park", href: "/destinations/hwange" },
+      { label: "Great Zimbabwe", href: "/destinations/great-zimbabwe" },
+      { label: "Nyanga & Eastern Highlands", href: "/destinations/nyanga" },
+      { label: "Cape Town", href: "/destinations/cape-town" },
+      { label: "Zanzibar", href: "/destinations/zanzibar" },
+      { label: "View All Destinations", href: "/destinations" },
+    ],
+  },
   { label: "Packages", href: "/packages" },
-  { label: "Trip Planner", href: "/trip-planner" },
   { label: "Promotions", href: "/promotions" },
   { label: "Contact", href: "/contact" },
 ]
@@ -124,10 +146,15 @@ export function Navbar() {
                       <ChevronDown className="h-3.5 w-3.5 transition-transform duration-200 group-data-[state=open]:rotate-180" />
                     </button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" className="w-56 animate-scale-in">
+                  <DropdownMenuContent align="start" className={`animate-scale-in ${link.children.length > 5 ? "w-64" : "w-56"}`}>
                     {link.children.map((child) => (
                       <DropdownMenuItem key={child.label} asChild>
-                        <Link href={child.href} className="flex items-center justify-between">
+                        <Link
+                          href={child.href}
+                          className={`flex items-center justify-between ${
+                            child.label.startsWith("View All") ? "border-t border-border font-semibold text-primary" : ""
+                          }`}
+                        >
                           {child.label}
                           <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
                         </Link>
@@ -177,8 +204,8 @@ export function Navbar() {
 
         {/* Mobile Nav */}
         <div
-          className={`overflow-hidden border-t border-border bg-card transition-all duration-300 lg:hidden ${
-            mobileOpen ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"
+          className={`overflow-hidden overflow-y-auto border-t border-border bg-card transition-all duration-300 lg:hidden ${
+            mobileOpen ? "max-h-[700px] opacity-100" : "max-h-0 opacity-0"
           }`}
         >
           <nav className="flex flex-col px-4 py-4">
